@@ -17,13 +17,19 @@ def trainspamfilter(xTr,yTr):
 
 
     # (not the most successful) EXAMPLE:
-    print("...using ridge")
-    f = lambda w : ridge(w,xTr,yTr,1)
+    print("...using hinge loss")
+    f = lambda w : logistic(w, xTr, yTr)  # Switch to logistic regression
 
-    w_trained = grdescent(f,np.zeros((xTr.shape[0],1)),1e-09,1000)
+
+    w_trained = grdescent(f,np.zeros((xTr.shape[0],1)),1e-02,1500)
 
     # YOUR CODE HERE
+    stepsize = 1e-02  # Increased step size for better convergence
+    maxiter = 1500  # Increased iterations for better training
 
+    w_trained = grdescent(f, np.zeros((xTr.shape[0], 1)), stepsize, maxiter)
 
+    # Save trained weights
     np.save('w_trained.npy', w_trained)
+
     return w_trained

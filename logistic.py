@@ -13,8 +13,26 @@ import numpy as np
 
     [d,n]=size(xTr);
 '''
-def logistic(w,xTr,yTr):
+def logistic(w, xTr, yTr):
+    """
+    Compute the logistic loss and gradient.
+    """
+    # Ensure correct shape of w (d x 1)
+    if w.ndim == 1:
+        w = w.reshape(-1, 1)  # Convert to column vector
 
-    # YOUR CODE HERE
+    # Get dimensions
+    d, n = xTr.shape  
 
-    return loss,gradient
+    # Compute predictions
+    wx = w.T @ xTr  # Shape: (1, n)
+    ywx = yTr * wx  # Element-wise multiplication (1, n)
+
+    # Compute logistic loss
+    loss = np.sum(np.log(1 + np.exp(-ywx))) / n  # Normalize by n
+
+    # Compute gradient
+    sigmoid = 1 / (1 + np.exp(ywx))  # Sigmoid function
+    gradient = - (xTr @ (yTr * sigmoid).T) / n  # Normalize by n
+
+    return loss, gradient

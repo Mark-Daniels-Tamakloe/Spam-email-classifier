@@ -16,5 +16,9 @@ xTr,xVal,yTr,yVal = valsplit(X,Y)
 # train spam filter with settings and parameters in trainspamfilter.py
 w_trained = trainspamfilter(xTr,yTr)
 
+print("Weight vector w_trained:\n", w_trained)
+print("Unique values in yTr:", np.unique(yTr))
+
+
 # evaluate spam filter on validation set using default threshold
 spamfilter(xVal,yVal,w_trained)

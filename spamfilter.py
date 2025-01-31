@@ -1,76 +1,69 @@
-
 import numpy as np
 from linearmodel import linearmodel
 from area_under_roc_curve import area_under_roc_curve
 from spamupdate import spamupdate
 
-def spamfilter(xTe,yTe,w_trained,thresh=0.3):
-        # 
-        #  INPUT:
-        #  xTe = dxn data matrix
-        #  yTe = 1xn label matrix
-        #  threshold = any prediction below this threshold is classified as ham
-        #
-        #  OUTPUT:
-        #  fpr = False positive rate
-        #  tpr = True positive rate
-        #  auc = Area under the ROC curve
-        #
+def spamfilter(xTe, yTe, w_trained, thresh=0.05):
+    """
+    Spam filter using linear classification.
 
-        [d,n]=np.shape(xTe)
+    INPUT:
+    xTe      : dxn data matrix (test set)
+    yTe      : 1xn label matrix (ground truth labels)
+    w_trained: dx1 weight vector (trained model)
+    thresh   : float - classification threshold (default: 0.3)
 
-        # go through xTe one by one
-        fpr=0
-        tpr=0
-        allpreds=np.zeros((1,n))
-        [d2,n2]=np.shape(yTe)
+    OUTPUT:
+    fpr : False positive rate
+    tpr : True positive rate
+    auc : Area under the ROC curve
+    """
 
-        for i in range(n2):
-            rawpred=0   # the raw prediction (real value)
-            pred=1      # setting prediction to 1 (either 1 or -1)
-            email=xTe[:,i]
-            truth=yTe[:,i]
+    [d, n] = np.shape(xTe)
 
-            # do prediction
-            rawpred=linearmodel(w_trained,email)
+    # Initialize counters
+    fpr = 0
+    tpr = 0
+    allpreds = np.zeros((1, n))
 
-            if(rawpred>thresh):
-                pred=1;
-            else:
-                pred=-1;
+    for i in range(n):
+        email = xTe[:, i].reshape(-1, 1)  # Ensure correct shape
+        truth = yTe[:, i]
 
-            if pred>0:
-                    pstring='SPAM'
-            else:
-                    pstring='GOOD'
+        # Compute raw prediction
+        rawpred = linearmodel(w_trained, email).item()  # Ensure it's a scalar
 
-            if truth==1:
-                    tstring='SPAM'
-            else:
-                    tstring='GOOD'
+        # Apply threshold for classification
+        pred = 1 if rawpred > thresh else -1
 
-            if yTe[:,i] != pred:
-                # print('Wrong: %s   TRUTH: %s \n' % (pstring,tstring));
-                if pred==1:
-                    fpr=fpr+1
+        # Count false positives and true positives
+        if pred != truth:
+            if pred == 1:  # False positive (classified as spam but not spam)
+                fpr += 1
 
-                # if you made a mistake, you have the chance to update w
-                w=spamupdate(w_trained,email,truth)
-            else:
-                # print('Correct: %s   TRUTH: %s \n' % (pstring,tstring));
-                if(pred>0):
-                    tpr=tpr+1
+            # Apply spam update if wrong prediction
+            w_trained = spamupdate(w_trained, email, truth)
 
-            allpreds[:,i] = rawpred
+        else:  # Correct classification
+            if pred == 1:  # True positive (correctly classified spam)
+                tpr += 1
 
-        a,b,auc=area_under_roc_curve(yTe,allpreds)
-        selectture=yTe[yTe==1]
-        selectfalse=yTe[yTe==-1]
-        tpr=tpr*1.0/selectture.size
-        fpr=fpr*1.0/selectfalse.size
+        # Store predictions
+        allpreds[:, i] = rawpred
 
-        print ("False positive rate: %.2f%%"%(fpr*100))
-        print ("True positive rate: %.2f%%"%(tpr*100))
-        print ("AUC: %.2f%%"%(auc*100))
+    # Compute ROC curve metrics
+    a, b, auc = area_under_roc_curve(yTe, allpreds)
 
-        return a, b, auc
+    # Compute FPR and TPR correctly
+    total_positives = np.sum(yTe == 1)
+    total_negatives = np.sum(yTe == -1)
+
+    tpr = tpr / total_positives if total_positives > 0 else 0
+    fpr = fpr / total_negatives if total_negatives > 0 else 0
+
+    # Print final evaluation metrics
+    print("False positive rate: {:.2f}%".format(fpr * 100))
+    print("True positive rate: {:.2f}%".format(tpr * 100))
+    print("AUC: {:.2f}%".format(float(np.mean(auc)) * 100))
+
+    return a, b, auc
