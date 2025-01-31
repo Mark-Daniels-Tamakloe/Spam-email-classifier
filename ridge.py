@@ -12,9 +12,9 @@ def ridge(w, xTr, yTr, lambdaa):
     error = (w.T @ xTr) - yTr  
 
     # Compute ridge regression loss (normalized MSE + regularization)
-    loss = np.mean(error ** 2) + lambdaa * np.sum(w ** 2)
+    loss = np.sum(error ** 2) + lambdaa * np.sum(w ** 2)
 
     # Compute gradient
-    gradient = (2 / n) * (xTr @ error.T) + 2 * lambdaa * w  
+    gradient = (2) * (xTr @ error.T) + 2 * lambdaa * w  
 
     return loss, gradient
