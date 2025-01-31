@@ -1,0 +1,7 @@
+# Ignore the entire data folder
+data/
+
+# Ignore all CSV, ZIP, and NumPy files
+*.csv
+*.zip
+*.npy
