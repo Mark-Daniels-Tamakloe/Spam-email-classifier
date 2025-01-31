@@ -16,10 +16,10 @@ def logistic(w, xTr, yTr):
     ywx = yTr * wx  # Element-wise multiplication (1, n)
 
     # Compute logistic loss
-    loss = np.mean(np.log(1 + np.exp(-ywx)))  
+    loss = np.sum(np.log(1 + np.exp(-ywx)))  
 
     # Compute gradient
     sigmoid = 1 / (1 + np.exp(-ywx))  
-    gradient = -(xTr @ ((1 - sigmoid) * yTr).T) / n  # Fix gradient direction
+    gradient = -(xTr @ ((sigmoid) * yTr).T)  # Fix gradient direction
 
     return loss, gradient
