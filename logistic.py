@@ -4,18 +4,22 @@ def logistic(w, xTr, yTr):
     """
     Compute the logistic loss and gradient.
     """
+    # Ensure correct shape of w (d x 1)
     if w.ndim == 1:
         w = w.reshape(-1, 1)  # Convert to column vector
 
+    # Get dimensions
     d, n = xTr.shape  
+
+    # Compute predictions
     wx = w.T @ xTr  # Shape: (1, n)
-    ywx = yTr * wx  # Element-wise multiplication
+    ywx = yTr * wx  # Element-wise multiplication (1, n)
 
-    # Stable logistic loss calculation
-    loss = np.mean(np.logaddexp(0, -ywx))
+    # Compute logistic loss
+    loss = np.sum(np.log(1 + np.exp(-ywx))) / n  # Normalize by n
 
-    # Compute gradient
-    sigmoid = 1 / (1 + np.exp(-ywx))  # Correct sigmoid formulation
-    gradient = -(xTr @ ((yTr * (1 - sigmoid)).T)) / n  # Fix gradient formulation
+    # Compute gradient (fix sign)
+    sigmoid = 1 / (1 + np.exp(-ywx))  # Corrected sigmoid function
+    gradient = (xTr @ ((sigmoid - 1) * yTr).T) / n  # Corrected gradient formula
 
     return loss, gradient
