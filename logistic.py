@@ -22,6 +22,6 @@ def logistic(w, xTr, yTr):
     sigmoid = 1 / (1 + np.exp(-ywx))  
     gradient = -(xTr @ ((np.exp(-ywx)*sigmoid) * yTr).T)  # Fix gradient direction
 
-    print(f" gradient shape: {gradient.shape}, w shape: {w.shape}")
+    #print(f" gradient shape: {gradient.shape}, w shape: {w.shape}")
 
     return loss, gradient
