@@ -43,3 +43,11 @@ This project implements a spam email classifier using supervised learning and st
 False positive rate: 0.65%
 True positive rate: 56.09%
 AUC: 97.97%
+
+
+---
+
+## 🙏 Acknowledgments
+
+This project was adapted from coursework originally developed by Professor Kilian Q. Weinberger and ported to Python by Cheng-Kun Ye (2019) for CSE517a at Washington University in St. Louis. I implemented the models and analysis independently as part of the graduate-level machine learning course.
+
